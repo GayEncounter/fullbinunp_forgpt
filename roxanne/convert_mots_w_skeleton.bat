@@ -1,0 +1,1 @@
+for %%I in (source\*.m2) do roxanne.exe -skl sammy_mag.skeleton.bin %%I result\%%~nI.m2
