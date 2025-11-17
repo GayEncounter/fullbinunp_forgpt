@@ -1,0 +1,13 @@
+LIBRARY     PHYSXLOADER.DLL
+
+EXPORTS
+    NxCreateModule                    ; NxCreateModule
+    NxCreatePhysicsSDK                ; NxCreatePhysicsSDK
+    NxCreatePhysicsSDKWithID          ; NxCreatePhysicsSDKWithID
+    NxGetCookingLib                   ; NxGetCookingLib
+    NxGetCookingLibWithID             ; NxGetCookingLibWithID
+    NxGetFoundationSDK                ; NxGetFoundationSDK
+    NxGetPhysicsSDK                   ; NxGetPhysicsSDK
+    NxGetPhysicsSDKAllocator          ; NxGetPhysicsSDKAllocator
+    NxGetUtilLib                      ; NxGetUtilLib
+    NxReleasePhysicsSDK               ; NxReleasePhysicsSDK

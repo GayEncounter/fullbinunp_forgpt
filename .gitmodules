@@ -1,0 +1,3 @@
+[submodule "DLLs/source/libgizmo_c_api"]
+	path = DLLs/source/libgizmo_c_api
+	url = https://cat-modera@bitbucket.org/cat-modera/libgizmo_c_api.git

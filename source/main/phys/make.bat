@@ -1,0 +1,1 @@
+cl /FePhysXHelper.dll /DWIN32 /EHsc /LD /MT helper.cpp user32.lib /link /LIBPATH:libs

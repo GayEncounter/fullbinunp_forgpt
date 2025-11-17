@@ -1,0 +1,1 @@
+cl /FePhysXHelper.dll /DWIN32 /D_DEBUG /EHsc /LD /MTd helper3.cpp common.cpp user32.lib delayimp.lib /link /LIBPATH:libs /DELAYLOAD:PhysXLoader.dll /DELAYLOAD:PhysXLoader64.dll
