@@ -1,0 +1,6 @@
+!!ARBfp1.0
+
+SUB result.depth.z, fragment.position.z, 0.0001;
+MOV result.color, { 0, 1, 0, 0 };
+
+END

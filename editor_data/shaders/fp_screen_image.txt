@@ -1,0 +1,14 @@
+!!ARBfp1.0
+
+ATTRIB tc = fragment.texcoord[0];
+TEMP offset;
+TEMP newtc;
+
+TEX offset, tc, texture[1], 2D; # distort
+MAD offset, offset, 2, -1; 
+MUL offset, offset, 0.03;
+ADD newtc, tc, offset;
+
+TEX result.color, newtc, texture[0], 2D;
+
+END

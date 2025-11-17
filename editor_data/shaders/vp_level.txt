@@ -1,0 +1,83 @@
+!!ARBvp1.0
+PARAM MVP[4] = { state.matrix.mvp };
+PARAM MV[4] = { state.matrix.modelview };
+
+PARAM env_sun_color  = program.env[0];
+PARAM env_sun_dir_v  = program.env[1];
+PARAM env_ambient    = program.env[2];
+PARAM env_hemi_color = program.env[3];
+
+ATTRIB vPos = vertex.attrib[0];
+ATTRIB vNrm = vertex.attrib[1];
+if(USE_BUMP) ATTRIB vT   = vertex.attrib[2];
+if(USE_BUMP) ATTRIB vB   = vertex.attrib[3];
+if(USE_TEXTURES) ATTRIB vTc0 = vertex.attrib[4];
+
+OUTPUT oT = result.texcoord[1];
+OUTPUT oB = result.texcoord[2];
+OUTPUT oN = result.texcoord[3];
+
+TEMP Nm; # normal in model space
+TEMP Nv; # normal in view space
+
+TEMP Ldir_v;
+TEMP C; # color
+
+TEMP Pv, tmp;
+
+DP4 result.position.x, MVP[0], vPos;
+DP4 result.position.y, MVP[1], vPos;
+DP4 result.position.z, MVP[2], vPos;
+DP4 result.position.w, MVP[3], vPos;
+
+# unpack texcoord (mul by 1/1024)
+if(USE_TEXTURES) MUL result.texcoord, vTc0, { 0.0009765625, 0.0009765625, 1, 1 }; 
+
+# unpack normal
+MAD Nm, vNrm.zyxw, 2, -1;
+MOV Nm.w, vNrm.w;
+
+# transform normal into view space
+DP3 Nv.x, Nm, MV[0];
+DP3 Nv.y, Nm, MV[1];
+DP3 Nv.z, Nm, MV[2];
+
+# transform point into view space
+DP4 Pv.x, vPos, MV[0];
+DP4 Pv.y, vPos, MV[1];
+DP4 Pv.z, vPos, MV[2];
+
+## calc ligthing
+
+# camera light
+# Ldir_v = normalize(Pv)
+if(!WEATHER) DP3 tmp.x, Pv, Pv;
+if(!WEATHER) RSQ tmp.y, tmp.x;
+if(!WEATHER) MUL Ldir_v, Pv, tmp.y;
+
+if(!WEATHER) DP3 C, Nv, -Ldir_v;
+if(!WEATHER) MAX C, C, 0;
+
+# sun light
+if(WEATHER) DP3 C, Nv, -env_sun_dir_v;
+if(WEATHER) MAX C, C, 0;
+if(WEATHER) MUL C, C, env_sun_color;
+
+if(WEATHER) MAD C, env_hemi_color, vNrm.wwww, C;
+if(WEATHER) ADD C, C, env_ambient;
+
+MOV result.color, C; # no AO
+if(SHOW_AO) MOV result.color, vNrm.wwww;
+MOV result.color.w, 1.0;
+
+# unpack tangent & binormal and pass TBN to fragment program
+if(USE_BUMP) MAD oT, vT.zyxw, 2, -1;
+if(USE_BUMP) MAD oB, vB.zyxw, 2, -1;
+if(USE_BUMP) MOV oN, Nm;
+
+#MOV result.color, vNrm.wwww;
+#MOV result.color, C;
+
+if(USE_BUMP) MOV result.texcoord[4], Pv;
+
+END

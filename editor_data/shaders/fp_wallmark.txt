@@ -1,0 +1,8 @@
+!!ARBfp1.0
+
+ATTRIB tc = fragment.texcoord[0];
+
+SUB result.depth.z, fragment.position.z, 0.001;
+TEX result.color, tc, texture[0], 2D;
+
+END

@@ -1,0 +1,16 @@
+name : name;
+name : stringz = 'layer';
+sound_supr_factor : fp32 = 1;
+background_sound : sound;
+background_sound : stringz = '';
+background_volume : fp32 = 1.0;
+background_accrue : fp32 = 2;
+background_falloff : fp32 = 2;
+background_random : bool = True;
+random_sounds : 'choose_array, str_shared';
+random_sounds : stringz = '';
+random_volume : fp32 = 1;
+random_distance_min : fp32 = 5;
+random_distance_max : fp32 = 10;
+random_angle_inner : 'angle, fp32' = 1.570796371;
+random_angle_outer : 'angle, fp32' = 3.141592741;

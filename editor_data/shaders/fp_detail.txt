@@ -1,0 +1,35 @@
+!!ARBfp1.0
+
+PARAM detail_params = program.local[1]; # scaleu, scalev, 1, intensity
+
+ATTRIB tc = fragment.texcoord[0];
+TEMP tc_detail, tex_color, tex_detail;
+TEMP mul1, mul2;
+TEMP det_int;
+
+TEX tex_color, tc, texture[0], 2D;
+MUL tc_detail, tc, detail_params.xyzz;
+TEX tex_detail, tc_detail, texture[1], 2D;
+
+#MUL mul1, tex_color, tex_detail;
+#MUL mul2, mul1, fragment.color;
+
+#MUL result.color, mul2, { 2, 2, 2, 1 };
+#MOV result.color.a, tex_color.a;
+
+# last light has strange detail textures
+# looks like three textures stored in one file in different channels
+# doens't know how game chooses right channel so just use green
+# 2033 models must also work fine with this
+# maybe even better due to color artifacts when using all three channels
+
+MUL det_int, detail_params.wwww, tex_detail.aaaa;
+
+#MAD mul1, tex_detail, 2, -1;
+MAD mul1, tex_detail.gggg, 2, -1;
+MAD mul2, mul1, det_int, tex_color; # apply intensity
+
+MUL result.color, mul2, fragment.color;
+MOV result.color.a, tex_color.a;
+
+END

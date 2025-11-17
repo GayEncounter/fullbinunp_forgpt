@@ -1,0 +1,156 @@
+'actions' = begin
+	'console command' = begin
+		clsid : stringz = 'actions/console command';
+		
+		in_names : stringz = 'activate';
+		out_names : stringz = '';
+		
+		properties = begin
+			cmd : stringz = '';
+		end;
+	end;
+	
+	engine = begin
+		'clone' = begin
+			clsid : stringz = 'actions/engine/clone';
+			
+			in_names : stringz = 'activate,Clone ref';
+			out_names : stringz = 'src,pos,parent,ok,fail,cloned';
+			
+			properties = begin
+				cover_reuse_delay : u32 = 10000;
+				count : u8 = 1;
+				tag : stringz = '';
+				source : 'entity_link, uobject_link' = 65535;
+				position : 'entity_link, uobject_link' = 65535;
+			end;
+		end;
+	end;
+	
+	net = begin
+		'respawn' = begin
+			clsid : stringz = 'actions/net/respawn';
+			
+			in_names : stringz = 'activate,Clone ref';
+			out_names : stringz = 'src,pos,ok,fail,instead_of,parent,cloned';
+			
+			properties = begin
+				cover_reuse_delay : u32 = 0;
+				count : u8 = 1;
+				tag : stringz = '';
+				source : 'entity_link, uobject_link' = 65535;
+				position : 'entity_link, uobject_link' = 65535;
+				team : u8 = 1;
+				flags0 : bool8 = 0;
+			end;
+		end;
+	end;
+end;
+
+'entities' = begin
+	'entity self' = begin
+		clsid : stringz = 'entities/entity self';
+		
+		in_names : stringz = 'entity';
+		out_names : stringz = '';
+	end;
+	
+	'entity ref' = begin
+		clsid : stringz = 'entities/entity ref';
+		
+		in_names : stringz = 'entity';
+		out_names : stringz = '';
+		
+		properties = begin
+			target : 'entity_link, uobject_link' = 65535;
+		end;
+	end;
+	
+	'entity player' = begin
+		clsid : stringz = 'entities/entity player';
+		
+		in_names : stringz = 'entity';
+		out_names : stringz = '';
+		
+		properties = begin
+			team : u8 = 0;
+		end;
+	end;
+	
+	'entity player self' = begin
+		clsid : stringz = 'entities/entity player self';
+		
+		in_names : stringz = 'entity';
+		out_names : stringz = '';
+		
+		properties = begin
+			team : u8 = 0;
+		end;
+	end;
+	
+	'entity user' = begin
+		clsid : stringz = 'entities/entity user';
+		
+		in_names : stringz = 'entity';
+		out_names : stringz = '';
+		
+		properties = begin
+			team : u8 = 0;
+		end;
+	end;
+end;
+
+'triggers' = begin
+	'game' = begin
+		'spectator trigger' = begin
+			clsid : stringz = 'triggers/game/spectator trigger';
+			
+			in_names : stringz = 'enable,disable,Camera_Reset';
+			out_names : stringz = 'target,Deactivated';
+			
+			properties = begin
+				active : bool = False;
+				camera_team : 'entity_link, uobject_link' = 65535;
+				current_object : u32 = 0;
+				objects_count_pre : u32 = 1;
+				object_0_name : stringz = '';
+				object_0_link : 'entity_link, uobject_link' = 65535;
+				object_0_lamp : 'entity_link, uobject_link' = 65535;
+				object_0_camera : 'entity_link, uobject_link' = 65535;
+				objects_count : u32 = 1;
+				team : u8 = 0;
+			end;
+		end;
+	end;
+	'startgame' = begin
+		clsid : stringz = 'triggers/startgame';
+		
+		in_names : stringz = 'enable,disable';
+		out_names : stringz = 'out';
+		
+		properties = begin
+			active : bool = True;
+			flags : bool8 = 0;
+		end;
+	end;
+	'use' = begin
+		clsid : stringz = 'triggers/use';
+		
+		in_names : stringz = 'enable,disable';
+		out_names : stringz = 'on_use,unk2,entity';
+		
+		properties = begin
+			active : bool = False;
+			player : bool = True;
+			usage_distance : fp32 = 2;
+			use_action : choose;
+			use_action : stringz = 'filter_take';
+			use_offset : vec2f = [0, -0.1000000015];
+			blink_distance : fp32 = 10;
+			flags8 : bool8 = 3;
+			user_team : u8 = 0;
+			in_reloading : bool = False;
+			mp_classes : u8_array = [];
+		end;
+	end;
+end;

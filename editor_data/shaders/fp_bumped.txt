@@ -1,0 +1,122 @@
+!!ARBfp1.0
+PARAM MVi[4] = { state.matrix.modelview.inverse };
+
+PARAM env_sun_color  = program.env[0];
+PARAM env_sun_dir_v  = program.env[1];
+PARAM env_ambient    = program.env[2];
+PARAM env_hemi_color = program.env[3];
+
+PARAM offset = program.local[1]; # offsetu, offsetv, bump_height, 0
+
+ATTRIB M0 = fragment.texcoord[1];
+ATTRIB M1 = fragment.texcoord[2];
+ATTRIB M2 = fragment.texcoord[3];
+
+ATTRIB Pv = fragment.texcoord[4];
+
+TEMP temp;
+TEMP tex_bump;
+
+TEMP C, L, S, CLS;
+TEMP tN;
+TEMP Ldir_m, Ldir_t;
+
+TEMP tc, tx, ty;
+
+#PARAM Ldir_v = { 0, 0, -1, 0 };
+TEMP Ldir_v;
+PARAM shininess = 30;
+
+# calculate normal from height map
+ADD tc, fragment.texcoord, offset.xwww;
+TEX tx, tc, texture[1], 2D;
+
+ADD tc, fragment.texcoord, offset.wyww;
+TEX ty, tc, texture[1], 2D;
+
+TEX tex_bump, fragment.texcoord, texture[1], 2D;
+MOV tN, tex_bump;
+
+SUB tN.x, tN.w, tx.w;
+SUB tN.y, tN.w, ty.w;
+MOV tN.z, 1;
+
+SWZ temp, offset, z, z, 1, 0;
+MUL tN, tN, temp;
+
+DP3 temp.x, tN, tN;
+RSQ temp.y, temp.x;
+MUL tN, tN, temp.y;
+
+## calculate lighting
+TEMP M0N, M1N, M2N;
+DP3 temp.x, M0, M0;
+RSQ temp.y, temp.x;
+MUL M0N, M0, temp.y;
+
+DP3 temp.x, M1, M1;
+RSQ temp.y, temp.x;
+MUL M1N, M1, temp.y;
+
+DP3 temp.x, M2, M2;
+RSQ temp.y, temp.x;
+MUL M2N, M2, temp.y;
+
+# camera light
+if(!WEATHER) MOV Ldir_v, Pv;
+if(!WEATHER) DP3 temp.x, Ldir_v, Ldir_v;
+if(!WEATHER) RSQ temp.y, temp.x;
+if(!WEATHER) MUL Ldir_v, Ldir_v, temp.y;
+
+# sun light
+if(WEATHER) MOV Ldir_v, env_sun_dir_v;
+
+DP3 Ldir_m.x, Ldir_v, MVi[0];
+DP3 Ldir_m.y, Ldir_v, MVi[1];
+DP3 Ldir_m.z, Ldir_v, MVi[2];
+
+DP3 Ldir_t.x, Ldir_m, M0N;
+DP3 Ldir_t.y, Ldir_m, M1N;
+DP3 Ldir_t.z, Ldir_m, M2N;
+
+DP3_SAT L, tN, -Ldir_t;
+
+# indirect hemi & ambient light
+if(WEATHER) MUL L, L, env_sun_color;
+if(WEATHER) MAD L, env_hemi_color, M2.wwww, L;
+if(WEATHER) ADD L, L, env_ambient;
+
+## specular
+TEMP Vv;
+TEMP Hv, Hm, Ht;
+
+DP3 temp.x, Pv, Pv;
+RSQ temp.y, temp.x;
+MUL Vv, Pv, temp.y;
+
+ADD Hv, Vv, Ldir_v;
+MUL Hv, Hv, 0.5;
+
+DP3 Hm.x, Hv, MVi[0];
+DP3 Hm.y, Hv, MVi[1];
+DP3 Hm.z, Hv, MVi[2];
+
+DP3 Ht.x, Hm, M0N;
+DP3 Ht.y, Hm, M1N;
+DP3 Ht.z, Hm, M2N;
+
+DP3_SAT S, tN, -Ht;
+
+LG2 S, S.x;
+MUL S, S, shininess;
+EX2 S, S.x;
+
+MUL S, tex_bump.gggg, S;
+
+TEX C, fragment.texcoord, texture[0], 2D;
+MAD CLS, C, L, S;
+
+MOV result.color, CLS;
+MOV result.color.a, C.a;
+
+END
